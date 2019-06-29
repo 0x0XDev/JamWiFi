@@ -3,6 +3,7 @@
 
 #### Update 1.2
 - Added Support for MacOS Mojave/Catalina
+- Added Dark Mode Support
 
 
 
