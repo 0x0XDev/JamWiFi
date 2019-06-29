@@ -18,12 +18,12 @@
 
 - (id)initWithFrame:(NSRect)frame sniffer:(ANWiFiSniffer *)theSniffer networks:(NSArray *)networks clients:(NSArray *)theClients {
     if ((self = [super initWithFrame:frame])) {
-        clients = [theClients mutableCopy];
+        clients = theClients.mutableCopy;
         sniffer = theSniffer;
-        [sniffer setDelegate:self];
+        sniffer.delegate = self;
         [sniffer start];
         
-        NSMutableArray * mChannels = [[NSMutableArray alloc] init];
+        NSMutableArray * mChannels = NSMutableArray.new;
         for (CWNetwork * net in networks) {
             if (![mChannels containsObject:net.wlanChannel]) {
                 [mChannels addObject:net.wlanChannel];
@@ -32,17 +32,17 @@
         channels = [mChannels copy];
         channelIndex = -1;
         
-        NSMutableDictionary * mNetworksPerChannel = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary * mNetworksPerChannel = NSMutableDictionary.new;
         for (CWChannel * channel in channels) {
-            NSMutableArray * mNetworks = [[NSMutableArray alloc] init];
+            NSMutableArray * mNetworks = NSMutableArray.new;
             for (CWNetwork * network in networks) {
                 if ([[network wlanChannel] isEqualToChannel:channel]) {
                     [mNetworks addObject:network];
                 }
             }
-            [mNetworksPerChannel setObject:[mNetworks copy] forKey:channel];
+            [mNetworksPerChannel setObject:mNetworks.copy forKey:channel];
         }
-        networksForChannel = [mNetworksPerChannel copy];
+        networksForChannel = mNetworksPerChannel.copy;
         
         jamTimer = [NSTimer scheduledTimerWithTimeInterval:0.02 target:self selector:@selector(performNextRound) userInfo:nil repeats:YES];
         [self performNextRound];
@@ -54,56 +54,56 @@
 
 - (void)configureUI {
     NSRect frame = self.bounds;
-    infoScrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(10, 52, frame.size.width - 20, frame.size.height - 62)];
-    infoTable = [[NSTableView alloc] initWithFrame:[[infoScrollView contentView] bounds]];
-    doneButton = [[NSButton alloc] initWithFrame:NSMakeRect(frame.size.width - 110, 10, 100, 24)];
-    backButton = [[NSButton alloc] initWithFrame:NSMakeRect(frame.size.width - 210, 10, 100, 24)];
-    newClientsCheck = [[NSButton alloc] initWithFrame:NSMakeRect(10, 10, 200, 24)];
+    infoScrollView = [NSScrollView.alloc initWithFrame:NSMakeRect(10, 52, frame.size.width - 20, frame.size.height - 62)];
+    infoTable = [NSTableView.alloc initWithFrame:infoScrollView.contentView.bounds];
+    doneButton = [NSButton.alloc initWithFrame:NSMakeRect(frame.size.width - 110, 10, 100, 24)];
+    backButton = [NSButton.alloc initWithFrame:NSMakeRect(frame.size.width - 210, 10, 100, 24)];
+    newClientsCheck = [NSButton.alloc initWithFrame:NSMakeRect(10, 10, 200, 24)];
     
-    [newClientsCheck setButtonType:NSSwitchButton];
-    [newClientsCheck setBezelStyle:NSRoundedBezelStyle];
-    [newClientsCheck setTitle:@"Actively scan for clients"];
-    [newClientsCheck setState:1];
+    newClientsCheck.buttonType = NSSwitchButton;
+    newClientsCheck.bezelStyle = NSRoundedBezelStyle;
+    newClientsCheck.title = @"Actively scan for clients";
+    newClientsCheck.state = 1;
     
-    [backButton setBezelStyle:NSRoundedBezelStyle];
-    [backButton setTitle:@"Back"];
-    [backButton setFont:[NSFont systemFontOfSize:13]];
-    [backButton setTarget:self];
-    [backButton setAction:@selector(backButton:)];
+    backButton.bezelStyle = NSRoundedBezelStyle;
+    backButton.title = @"Back";
+    backButton.font = [NSFont systemFontOfSize:13];
+    backButton.target = self;
+    backButton.action = @selector(backButton:);
     
-    [doneButton setBezelStyle:NSRoundedBezelStyle];
-    [doneButton setTitle:@"Done"];
-    [doneButton setFont:[NSFont systemFontOfSize:13]];
-    [doneButton setTarget:self];
-    [doneButton setAction:@selector(doneButton:)];
+    doneButton.bezelStyle = NSRoundedBezelStyle;
+    doneButton.title = @"Done";
+    doneButton.font = [NSFont systemFontOfSize:13];
+    doneButton.target = self;
+    doneButton.action = @selector(doneButton:);
     
-    NSTableColumn * enabledColumn = [[NSTableColumn alloc] initWithIdentifier:@"enabled"];
-    [[enabledColumn headerCell] setStringValue:@"Jam"];
-    [enabledColumn setWidth:30];
-    [enabledColumn setEditable:YES];
+    NSTableColumn * enabledColumn = [NSTableColumn.alloc initWithIdentifier:@"enabled"];
+    enabledColumn.headerCell.stringValue = @"Jam";
+    enabledColumn.width = 30;
+    enabledColumn.editable = YES;
     [infoTable addTableColumn:enabledColumn];
     
-    NSTableColumn * stationColumn = [[NSTableColumn alloc] initWithIdentifier:@"station"];
-    [[stationColumn headerCell] setStringValue:@"Station"];
-    [stationColumn setWidth:120];
-    [stationColumn setEditable:NO];
-    [infoTable addTableColumn:stationColumn];
+    NSTableColumn * deviceColumn = [NSTableColumn.alloc initWithIdentifier:@"device"];
+    deviceColumn.headerCell.stringValue = @"Device";
+    deviceColumn.width = 120;
+    deviceColumn.editable = NO;
+    [infoTable addTableColumn:deviceColumn];
     
-    NSTableColumn * deauthsColumn = [[NSTableColumn alloc] initWithIdentifier:@"count"];
-    [[deauthsColumn headerCell] setStringValue:@"Deauths"];
-    [deauthsColumn setWidth:120];
-    [deauthsColumn setEditable:NO];
+    NSTableColumn * deauthsColumn = [NSTableColumn.alloc initWithIdentifier:@"count"];
+    deauthsColumn.headerCell.stringValue = @"Deauths";
+    deauthsColumn.width = 120;
+    deauthsColumn.editable = NO;
     [infoTable addTableColumn:deauthsColumn];
     
-    [infoScrollView setDocumentView:infoTable];
-    [infoScrollView setBorderType:NSBezelBorder];
-    [infoScrollView setHasVerticalScroller:YES];
-    [infoScrollView setHasHorizontalScroller:YES];
-    [infoScrollView setAutohidesScrollers:NO];
+    infoScrollView.documentView = infoTable;
+    infoScrollView.borderType = NSBezelBorder;
+    infoScrollView.hasVerticalScroller = YES;
+    infoScrollView.hasHorizontalScroller = YES;
+    infoScrollView.autohidesScrollers = NO;
     
-    [infoTable setDataSource:self];
-    [infoTable setDelegate:self];
-    [infoTable setAllowsMultipleSelection:YES];
+    infoTable.dataSource = self;
+    infoTable.delegate = self;
+    infoTable.allowsMultipleSelection = YES;
     
     [self addSubview:infoScrollView];
     [self addSubview:backButton];
@@ -122,28 +122,28 @@
 - (void)backButton:(id)sender {
     [jamTimer invalidate];
     jamTimer = nil;
-    [sniffer setDelegate:nil];
-    NSMutableArray * networks = [NSMutableArray array];
+    sniffer.delegate = nil;
+    NSMutableArray * networks = NSMutableArray.array;
     for (id key in networksForChannel) {
         [networks addObjectsFromArray:[networksForChannel objectForKey:key]];
     }
-    ANTrafficGatherer * gatherer = [[ANTrafficGatherer alloc] initWithFrame:self.bounds sniffer:sniffer networks:networks];
-    [(ANAppDelegate *)[NSApp delegate] pushView:gatherer direction:ANViewSlideDirectionBackward];
+    ANTrafficGatherer * gatherer = [ANTrafficGatherer.alloc initWithFrame:self.bounds sniffer:sniffer networks:networks];
+    [(ANAppDelegate *)NSApp.delegate pushView:gatherer direction:ANViewSlideDirectionBackward];
 }
 
 - (void)doneButton:(id)sender {
     [jamTimer invalidate];
     jamTimer = nil;
     [sniffer stop];
-    [sniffer setDelegate:nil];
+    sniffer.delegate = nil;
     sniffer = nil;
-    [(ANAppDelegate *)[NSApp delegate] showNetworkList];
+    [(ANAppDelegate *)NSApp.delegate showNetworkList];
 }
 
 #pragma mark - Table View -
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    return [clients count];
+    return clients.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
@@ -160,9 +160,9 @@
 
 - (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     if ([[tableColumn identifier] isEqualToString:@"enabled"]) {
-        NSButtonCell * cell = [[NSButtonCell alloc] init];
-        [cell setButtonType:NSSwitchButton];
-        [cell setTitle:@""];
+        NSButtonCell * cell = NSButtonCell.new;
+        cell.buttonType = NSSwitchButton;
+        cell.title = @"";
         return cell;
     }
     return nil;
@@ -205,7 +205,7 @@
     memcpy(&deauth[4], client, 6);
     memcpy(&deauth[10], bssid, 6);
     memcpy(&deauth[16], bssid, 6);
-    AN80211Packet * packet = [[AN80211Packet alloc] initWithData:[NSData dataWithBytes:deauth length:26]];
+    AN80211Packet * packet = [AN80211Packet.alloc initWithData:[NSData dataWithBytes:deauth length:26]];
     return packet;
 }
 
@@ -251,7 +251,7 @@
     if (client[0] == 0xFF && client[1] == 0xFF) hasClient = NO;
     if (client[0] == 0x03 && client[5] == 0x01) hasClient = NO;
     if (hasClient) {
-        ANClient * clientObj = [[ANClient alloc] initWithMac:client bssid:bssid];
+        ANClient * clientObj = [ANClient.alloc initWithMac:client bssid:bssid];
         BOOL containsClient = NO;
         for (ANClient * aClient in clients) {
             if (memcmp(aClient.macAddress, clientObj.macAddress, 6) == 0) {

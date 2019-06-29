@@ -18,9 +18,9 @@
         
         networks = theNetworks;
         sniffer = aSniffer;
-        allClients = [[NSMutableArray alloc] init];
+        allClients = NSMutableArray.new;
         
-        NSMutableArray * mChannels = [[NSMutableArray alloc] init];
+        NSMutableArray * mChannels = NSMutableArray.new;
         for (CWNetwork * net in networks) {
             if (![mChannels containsObject:net.wlanChannel]) {
                 [mChannels addObject:net.wlanChannel];
@@ -39,10 +39,10 @@
 
 - (void)configureUI {
     NSRect frame = self.frame;
-    clientsScrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(10, 52, frame.size.width - 20, frame.size.height - 62)];
-    clientsTable = [[NSTableView alloc] initWithFrame:[[clientsScrollView contentView] bounds]];
-    backButton = [[NSButton alloc] initWithFrame:NSMakeRect(10, 10, 100, 24)];
-    continueButton = [[NSButton alloc] initWithFrame:NSMakeRect(frame.size.width - 110, 10, 100, 24)];
+    clientsScrollView = [NSScrollView.alloc initWithFrame:NSMakeRect(10, 52, frame.size.width - 20, frame.size.height - 62)];
+    clientsTable = [NSTableView.alloc initWithFrame:clientsScrollView.contentView.bounds];
+    backButton = [NSButton.alloc initWithFrame:NSMakeRect(10, 10, 100, 24)];
+    continueButton = [NSButton.alloc initWithFrame:NSMakeRect(frame.size.width - 110, 10, 100, 24)];
 	
 	backButton.bezelStyle = NSRoundedBezelStyle;
 	backButton.title = @"Back";
@@ -56,31 +56,31 @@
 	continueButton.target = self;
 	continueButton.action = @selector(continueButton:);
     
-    NSTableColumn * checkedColumn = [[NSTableColumn alloc] initWithIdentifier:@"enabled"];
+    NSTableColumn * checkedColumn = [NSTableColumn.alloc initWithIdentifier:@"enabled"];
 	checkedColumn.headerCell.stringValue = @"Jam";
 	checkedColumn.width = 30;
 	checkedColumn.editable = YES;
     [clientsTable addTableColumn:checkedColumn];
     
-    NSTableColumn * stationColumn = [[NSTableColumn alloc] initWithIdentifier:@"device"];
-	stationColumn.headerCell.stringValue = @"Device";
-	stationColumn.width = 120;
-	stationColumn.editable = NO;
-    [clientsTable addTableColumn:stationColumn];
+    NSTableColumn * deviceColumn = [NSTableColumn.alloc initWithIdentifier:@"device"];
+	deviceColumn.headerCell.stringValue = @"Device";
+	deviceColumn.width = 120;
+	deviceColumn.editable = NO;
+    [clientsTable addTableColumn:deviceColumn];
     
-    NSTableColumn * bssidColumn = [[NSTableColumn alloc] initWithIdentifier:@"bssid"];
+    NSTableColumn * bssidColumn = [NSTableColumn.alloc initWithIdentifier:@"bssid"];
 	bssidColumn.headerCell.stringValue = @"BSSID";
 	bssidColumn.width = 120;
 	bssidColumn.editable = NO;
     [clientsTable addTableColumn:bssidColumn];
     
-    NSTableColumn * packetsColumn = [[NSTableColumn alloc] initWithIdentifier:@"count"];
+    NSTableColumn * packetsColumn = [NSTableColumn.alloc initWithIdentifier:@"count"];
 	packetsColumn.headerCell.stringValue = @"Packets";
 	packetsColumn.width = 120;
 	packetsColumn.editable = NO;
     [clientsTable addTableColumn:packetsColumn];
     
-    NSTableColumn * rssiColumn = [[NSTableColumn alloc] initWithIdentifier:@"rssi"];
+    NSTableColumn * rssiColumn = [NSTableColumn.alloc initWithIdentifier:@"rssi"];
 	rssiColumn.headerCell.stringValue = @"RSSI";
 	rssiColumn.width = 70;
 	rssiColumn.editable = NO;
@@ -110,12 +110,12 @@
     [sniffer stop];
 	sniffer.delegate = nil;
     sniffer = nil;
-    [(ANAppDelegate *)[NSApp delegate] showNetworkList];
+    [(ANAppDelegate *)NSApp.delegate showNetworkList];
 }
 
 - (void)continueButton:(id)sender {
-    ANClientKiller *killer = [[ANClientKiller alloc] initWithFrame:self.bounds sniffer:sniffer networks:networks clients:allClients];
-    [(ANAppDelegate *)[NSApp delegate] pushView:killer direction:ANViewSlideDirectionForward];
+    ANClientKiller *killer = [ANClientKiller.alloc initWithFrame:self.bounds sniffer:sniffer networks:networks clients:allClients];
+    [(ANAppDelegate *)NSApp.delegate pushView:killer direction:ANViewSlideDirectionForward];
 }
 
 #pragma mark - Table View -
@@ -126,7 +126,7 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     ANClient * client = [allClients objectAtIndex:row];
-    if ([[tableColumn identifier] isEqualToString:@"station"]) {
+    if ([[tableColumn identifier] isEqualToString:@"device"]) {
         return MACToString(client.macAddress);
     } else if ([[tableColumn identifier] isEqualToString:@"bssid"]) {
         return MACToString(client.bssid);
@@ -149,7 +149,7 @@
 
 - (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     if ([[tableColumn identifier] isEqualToString:@"enabled"]) {
-        NSButtonCell * cell = [NSButtonCell new];
+        NSButtonCell * cell = NSButtonCell.new;
         cell.buttonType = NSSwitchButton;
         cell.title = @"";
         return cell;
@@ -213,7 +213,7 @@
     if (client[0] == 0x01 && client[1] == 0x00) hasClient = NO;
     if (client[0] == 0xFF && client[1] == 0xFF) hasClient = NO;
     if (hasClient) {
-        ANClient * clientObj = [[ANClient alloc] initWithMac:client bssid:bssid];
+        ANClient * clientObj = [ANClient.alloc initWithMac:client bssid:bssid];
         if (![allClients containsObject:clientObj]) {
             [allClients addObject:clientObj];
         } else {

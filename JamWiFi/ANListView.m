@@ -22,12 +22,12 @@
 
 - (id)initWithFrame:(NSRect)frame {
     if ((self = [super initWithFrame:frame])) {
-        networksScrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(10, 52, frame.size.width - 20, frame.size.height - 62)];
-        networksTable = [[NSTableView alloc] initWithFrame:[[networksScrollView contentView] bounds]];
-        disassociateButton = [[NSButton alloc] initWithFrame:NSMakeRect(10, 10, 100, 24)];
-        scanButton = [[NSButton alloc] initWithFrame:NSMakeRect(110, 10, 100, 24)];
-        progressIndicator = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(225, 14, 16, 16)];
-        jamButton = [[NSButton alloc] initWithFrame:NSMakeRect(frame.size.width - 110, 10, 100, 24)];
+        networksScrollView = [NSScrollView.alloc initWithFrame:NSMakeRect(10, 52, frame.size.width - 20, frame.size.height - 62)];
+        networksTable = [NSTableView.alloc initWithFrame:networksScrollView.contentView.bounds];
+        disassociateButton = [NSButton.alloc initWithFrame:NSMakeRect(10, 10, 100, 24)];
+        scanButton = [NSButton.alloc initWithFrame:NSMakeRect(110, 10, 100, 24)];
+        progressIndicator = [NSProgressIndicator.alloc initWithFrame:NSMakeRect(225, 14, 16, 16)];
+        jamButton = [NSButton.alloc initWithFrame:NSMakeRect(frame.size.width - 110, 10, 100, 24)];
         
         [progressIndicator setControlSize:NSSmallControlSize];
         [progressIndicator setStyle:NSProgressIndicatorSpinningStyle];
@@ -52,31 +52,31 @@
         [jamButton setFont:[NSFont systemFontOfSize:13]];
         [jamButton setEnabled:NO];
         
-        NSTableColumn * channelColumn = [[NSTableColumn alloc] initWithIdentifier:@"channel"];
+        NSTableColumn * channelColumn = [NSTableColumn.alloc initWithIdentifier:@"channel"];
         [[channelColumn headerCell] setStringValue:@"CH"];
         [channelColumn setWidth:40];
         [channelColumn setEditable:YES];
         [networksTable addTableColumn:channelColumn];
         
-        NSTableColumn * essidColumn = [[NSTableColumn alloc] initWithIdentifier:@"essid"];
+        NSTableColumn * essidColumn = [NSTableColumn.alloc initWithIdentifier:@"essid"];
         [[essidColumn headerCell] setStringValue:@"ESSID"];
         [essidColumn setWidth:170];
         [essidColumn setEditable:YES];
         [networksTable addTableColumn:essidColumn];
         
-        NSTableColumn * bssidColumn = [[NSTableColumn alloc] initWithIdentifier:@"bssid"];
+        NSTableColumn * bssidColumn = [NSTableColumn.alloc initWithIdentifier:@"bssid"];
         [[bssidColumn headerCell] setStringValue:@"BSSID"];
         [bssidColumn setWidth:120];
         [bssidColumn setEditable:YES];
         [networksTable addTableColumn:bssidColumn];
         
-        NSTableColumn * encColumn = [[NSTableColumn alloc] initWithIdentifier:@"enc"];
+        NSTableColumn * encColumn = [NSTableColumn.alloc initWithIdentifier:@"enc"];
         [[encColumn headerCell] setStringValue:@"Security"];
         [encColumn setWidth:60];
         [encColumn setEditable:YES];
         [networksTable addTableColumn:encColumn];
       
-        NSTableColumn * rssiColumn = [[NSTableColumn alloc] initWithIdentifier:@"rssi"];
+        NSTableColumn * rssiColumn = [NSTableColumn.alloc initWithIdentifier:@"rssi"];
         [[rssiColumn headerCell] setStringValue:@"RSSI"];
         [rssiColumn setWidth:60];
         [rssiColumn setEditable:YES];
@@ -123,9 +123,9 @@
         [theNetworks addObject:[self->networks objectAtIndex:idx]];
     }];
     
-    ANWiFiSniffer * sniffer = [[ANWiFiSniffer alloc] initWithInterfaceName:interfaceName];
-    ANTrafficGatherer * gatherer = [[ANTrafficGatherer alloc] initWithFrame:self.bounds sniffer:sniffer networks:theNetworks];
-    [(ANAppDelegate *)[NSApp delegate] pushView:gatherer direction:ANViewSlideDirectionForward];
+    ANWiFiSniffer * sniffer = [ANWiFiSniffer.alloc initWithInterfaceName:interfaceName];
+    ANTrafficGatherer * gatherer = [ANTrafficGatherer.alloc initWithFrame:self.bounds sniffer:sniffer networks:theNetworks];
+    [(ANAppDelegate *)NSApp.delegate pushView:gatherer direction:ANViewSlideDirectionForward];
 }
 
 
@@ -140,7 +140,7 @@
 			_open(&airportHandle);
 			bind(airportHandle, self->interfaceName);
 			NSArray *foundNets;
-			NSDictionary *params = [NSDictionary new];
+			NSDictionary *params = NSDictionary.new;
 			scan(airportHandle, &foundNets, (__bridge void *)(params));
 		
 			if (!foundNets) {
@@ -152,10 +152,10 @@
 				[weakSelf performSelectorOnMainThread:@selector(handleScanError) withObject:nil waitUntilDone:NO];
 			} else {
 				
-				NSMutableArray *networks = [NSMutableArray new];
+				NSMutableArray *networks = NSMutableArray.new;
 				
 				for(NSDictionary *dict in foundNets) {
-					CWNetwork *network = [CWNetwork new];
+					CWNetwork *network = CWNetwork.new;
 					[network setValue:dict forKey:@"_scanRecord"];
 					[networks addObject:network];
 				}

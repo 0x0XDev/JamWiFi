@@ -15,8 +15,8 @@ static int getRadiotapRSSI(const u_char * packet);
 @synthesize interface;
 
 - (id)initWithInterface:(NSString *)name {
-    if ((self = [super init])) {
-        interface = [[CWInterface alloc] initWithInterfaceName:name];
+    if ((self = super.init)) {
+        interface = [CWInterface.alloc initWithInterfaceName:name];
         [interface disassociate];
         if (!interface) return nil;
         pcapHandle = pcap_open_live([name UTF8String], 65536, 1, 1, pcapError);
@@ -44,7 +44,7 @@ static int getRadiotapRSSI(const u_char * packet);
             const u_char * dataBuffer = buffer + words[1];
             uint32_t len = header->caplen - words[1];
             NSData * data = [NSData dataWithBytes:dataBuffer length:len];
-            AN80211Packet * result = [[AN80211Packet alloc] initWithData:data];
+            AN80211Packet * result = [AN80211Packet.alloc initWithData:data];
             result.rssi = getRadiotapRSSI(buffer);
             return result;
         }

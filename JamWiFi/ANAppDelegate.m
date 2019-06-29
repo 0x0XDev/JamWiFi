@@ -30,7 +30,7 @@
 	scan = dlsym(libHandle, "Apple80211Scan");
 	_close = dlsym(libHandle, "Apple80211Close");
 	
-    networkList = [[ANListView alloc] initWithFrame:[self.window.contentView bounds]];
+    networkList = [ANListView.alloc initWithFrame:self.window.contentView.bounds];
     [self pushView:networkList direction:ANViewSlideDirectionForward];
     [CarbonAppProcess.currentProcess makeFrontmost];
 }

@@ -11,7 +11,7 @@
 @implementation AN80211Packet
 
 - (id)initWithData:(NSData *)data {
-    if ((self = [super init])) {
+    if ((self = super.init)) {
         if ([data length] < 24) return nil;
         packetData = (unsigned char *)malloc([data length]);
         memcpy(packetData, [data bytes], [data length]);

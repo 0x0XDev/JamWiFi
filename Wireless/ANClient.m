@@ -18,7 +18,7 @@
 @synthesize enabled;
 
 - (id)initWithMac:(const unsigned char *)mac bssid:(const unsigned char *)aBSSID {
-    if ((self = [super init])) {
+    if ((self = super.init)) {
         macAddress = (unsigned char *)malloc(6);
         bssid = (unsigned char *)malloc(6);
         packetCount = 0;

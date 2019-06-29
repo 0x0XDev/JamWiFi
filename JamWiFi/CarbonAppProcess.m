@@ -12,14 +12,14 @@
 @implementation CarbonAppProcess
 
 - (id)init {
-    if ((self = [super init])) {
+    if ((self = super.init)) {
         // Initialization code here.
 	}
     return self;
 }
 
 - (id)initWithProcessSerial:(ProcessSerialNumber)num {
-	if ((self = [super init])) {
+	if ((self = super.init)) {
 		processSerial = num;
 	}
 	return self;
@@ -28,13 +28,13 @@
 + (CarbonAppProcess *)currentProcess {
 	ProcessSerialNumber frontmost;
 	GetCurrentProcess(&frontmost);
-	return [[CarbonAppProcess alloc] initWithProcessSerial:frontmost];
+	return [CarbonAppProcess.alloc initWithProcessSerial:frontmost];
 }
 
 + (CarbonAppProcess *)frontmostProcess {
 	ProcessSerialNumber frontmost;
 	GetFrontProcess(&frontmost);
-	return [[CarbonAppProcess alloc] initWithProcessSerial:frontmost];
+	return [CarbonAppProcess.alloc initWithProcessSerial:frontmost];
 }
 
 + (CarbonAppProcess *)nextProcess {
@@ -43,7 +43,7 @@
 		NSLog(@"No next process");
 		return nil;
 	}
-	return [[CarbonAppProcess alloc] initWithProcessSerial:next];
+	return [CarbonAppProcess.alloc initWithProcessSerial:next];
 }
 
 - (void)makeFrontmost {

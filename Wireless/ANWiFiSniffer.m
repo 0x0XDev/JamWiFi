@@ -23,10 +23,10 @@
 @synthesize delegate;
 
 - (id)initWithInterfaceName:(NSString *)name {
-    if ((self = [super init])) {
+    if ((self = super.init)) {
         interfaceName = name;
-        writeBuffer = [[NSMutableArray alloc] init];
-        channelLock = [[NSLock alloc] init];
+        writeBuffer = NSMutableArray.new;
+        channelLock = NSLock.new;
     }
     return self;
 }
@@ -36,7 +36,7 @@
     @synchronized (writeBuffer) {
         [writeBuffer removeAllObjects];
     }
-    backgroundThread = [[NSThread alloc] initWithTarget:self selector:@selector(backgroundThread) object:nil];
+    backgroundThread = [NSThread.alloc initWithTarget:self selector:@selector(backgroundThread) object:nil];
     [backgroundThread start];
 }
 
@@ -64,7 +64,7 @@
 
 - (void)backgroundThread {
     @autoreleasepool {
-        interface = [[ANInterface alloc] initWithInterface:interfaceName];
+        interface = [ANInterface.alloc initWithInterface:interfaceName];
         if (!interface) {
             [self informDelegateOpenFailed];
             return;
@@ -72,7 +72,7 @@
         AN80211Packet * packet = nil;
         while (true) {
             @autoreleasepool {
-                if ([[NSThread currentThread] isCancelled]) {
+                if (NSThread.currentThread.isCancelled) {
                     [interface closeInterface];
                     interface = nil;
                     return;
@@ -99,7 +99,7 @@
                 if (packet) [self informDelegatePacket:packet];
                 AN80211Packet * wPacket = nil;
                 @synchronized (writeBuffer) {
-                    if ([writeBuffer count] > 0) {
+                    if (writeBuffer.count > 0) {
                         wPacket = [writeBuffer objectAtIndex:0];
                         [writeBuffer removeObjectAtIndex:0];
                     }
@@ -120,7 +120,7 @@
 }
 
 - (void)informDelegateOpenFailed {
-    if (![[NSThread currentThread] isMainThread]) {
+    if (!NSThread.currentThread.isMainThread) {
         [self performSelectorOnMainThread:@selector(informDelegateOpenFailed) withObject:nil waitUntilDone:NO];
         return;
     }
@@ -131,7 +131,7 @@
 }
 
 - (void)informDelegateError:(NSError *)error {
-    if (![[NSThread currentThread] isMainThread]) {
+    if (!NSThread.currentThread.isMainThread) {
         [self performSelectorOnMainThread:@selector(informDelegateError:) withObject:error waitUntilDone:NO];
         return;
     }
@@ -142,7 +142,7 @@
 }
 
 - (void)informDelegatePacket:(AN80211Packet *)packet {
-    if (![[NSThread currentThread] isMainThread]) {
+    if (!NSThread.currentThread.isMainThread) {
         [self performSelectorOnMainThread:@selector(informDelegatePacket:) withObject:packet waitUntilDone:NO];
         return;
     }

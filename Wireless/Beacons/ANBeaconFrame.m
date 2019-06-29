@@ -13,7 +13,7 @@
 @synthesize packet;
 
 - (id)initWithPacket:(AN80211Packet *)beacon {
-    if ((self = [super init])) {
+    if ((self = super.init)) {
         packet = beacon;
         int bodyOffset = 0x0c;
         if (bodyOffset >= packet.bodyLength - 4) return nil;
@@ -24,7 +24,7 @@
             // NSLog(@"Type: %d len: %d", typeID, length);
             if (length + i + 2 > packet.bodyLength) return nil;
             NSData * data = [NSData dataWithBytes:&packet.bodyData[i + 2] length:length];
-            ANBeaconPart * part = [[ANBeaconPart alloc] initWithType:typeID data:data];
+            ANBeaconPart * part = [ANBeaconPart.alloc initWithType:typeID data:data];
             [mParts addObject:part];
             i += length;
         }
@@ -43,7 +43,7 @@
 - (NSString *)essid {
     ANBeaconPart * part = [self beaconPartWithID:0];
     if (!part) return nil;
-    return [[NSString alloc] initWithData:part.data encoding:NSUTF8StringEncoding];
+    return [NSString.alloc initWithData:part.data encoding:NSUTF8StringEncoding];
 }
 
 - (NSUInteger)channel {
