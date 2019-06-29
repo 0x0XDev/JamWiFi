@@ -1,4 +1,4 @@
-```**This Repo is the continuation of @unixpickle/JamWiFi, since it got deprecated and won't be updated**```
+> **This Repo is the continuation of @unixpickle/JamWiFi, since it got deprecated and won't be updated**
 
 #### Update 1.2
 - Added Support for MacOS Mojave/Catalina
