@@ -46,7 +46,7 @@
         [disassociateButton setFont:[NSFont systemFontOfSize:13]];
         
         [jamButton setBezelStyle:NSRoundedBezelStyle];
-        [jamButton setTitle:@"Jam"];
+        [jamButton setTitle:@"Monitor"];
         [jamButton setTarget:self];
         [jamButton setAction:@selector(jamButton:)];
         [jamButton setFont:[NSFont systemFontOfSize:13]];
@@ -72,7 +72,7 @@
         
         NSTableColumn * encColumn = [NSTableColumn.alloc initWithIdentifier:@"enc"];
         [[encColumn headerCell] setStringValue:@"Security"];
-        [encColumn setWidth:60];
+        [encColumn setWidth:160];
         [encColumn setEditable:YES];
         [networksTable addTableColumn:encColumn];
       
@@ -204,15 +204,22 @@
 }
 
 - (NSString *)securityTypeString:(CWNetwork *)network {
-    if ([network supportsSecurity:kCWSecurityDynamicWEP]) {
-        return @"WEP";
-    } else if ([network supportsSecurity:kCWSecurityNone]) {
-        return @"Open";
-    } else if ([network supportsSecurity:kCWSecurityEnterprise]) {
-        return @"Enterprise";
-    } else {
-        return @"WPA";
-    }
+	
+	NSMutableArray *securityArray = NSMutableArray.array;
+	
+	if ([network supportsSecurity:kCWSecurityNone]) return @"Open";
+	if ([network supportsSecurity:kCWSecurityWEP]) [securityArray addObject:@"WEP"];
+	if ([network supportsSecurity:kCWSecurityDynamicWEP]) [securityArray addObject:@"Dynamic WEP"];
+	if ([network supportsSecurity:kCWSecurityWPAPersonal]) [securityArray addObject:@"WPA (P)"];
+	if ([network supportsSecurity:kCWSecurityWPA2Personal]) [securityArray addObject:@"WPA2 (P)"];
+	if ([network supportsSecurity:kCWSecurityWPAEnterprise]) [securityArray addObject:@"WPA (E)"];
+	
+	if ([network supportsSecurity:kCWSecurityWPA2Enterprise]) [securityArray addObject:@"WPA2 (E)"];
+	if ([network supportsSecurity:kCWSecurityUnknown]) [securityArray addObject:@"Unknown"];
+	
+	if (!securityArray.count) return @"?";
+	else return [securityArray componentsJoinedByString:@" / "];
+
 }
 
 #pragma mark - Private -
