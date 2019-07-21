@@ -147,8 +147,7 @@ uint32_t crc32(const char *buf, size_t len)
 {
       uint32_t crc = 0xFFFFFFFF;
 
-      for ( ; len; --len, ++buf)
-      {
+      for ( ; len; --len, ++buf) {
             crc = UPDC32(*buf, crc);
       }
 

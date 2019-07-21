@@ -19,7 +19,7 @@ static int getRadiotapRSSI(const u_char * packet);
         interface = [CWInterface.alloc initWithInterfaceName:name];
         [interface disassociate];
         if (!interface) return nil;
-        pcapHandle = pcap_open_live([name UTF8String], 65536, 1, 1, pcapError);
+        pcapHandle = pcap_open_live(name.UTF8String, 65536, 1, 1, pcapError);
         if (!pcapHandle) return nil;
         pcap_set_datalink(pcapHandle, DLT_IEEE802_11_RADIO);
     }
@@ -55,19 +55,19 @@ static int getRadiotapRSSI(const u_char * packet);
 
 - (BOOL)writePacket:(AN80211Packet *)packet {
     uint16_t radioLen = 8;
-    unsigned char * radioData = (unsigned char *)malloc([packet packetLength] + radioLen);
+    unsigned char * radioData = (unsigned char *)malloc(packet.packetLength + radioLen);
     memcpy(&radioData[2], &radioLen, 2);
-    memcpy(&radioData[radioLen], [packet packetData], [packet packetLength]);
-    int len = pcap_inject(pcapHandle, radioData, radioLen + [packet packetLength]);
+    memcpy(&radioData[radioLen], packet.packetData, packet.packetLength);
+    int len = pcap_inject(pcapHandle, radioData, radioLen + packet.packetLength);
     free(radioData);
-    return (len == [packet packetLength] + radioLen);
+    return (len == packet.packetLength + radioLen);
 }
 
 - (BOOL)setChannel:(NSInteger)channel {
     [interface disassociate];
-    NSSet * channels = [interface supportedWLANChannels];
+    NSSet * channels = interface.supportedWLANChannels;
     for (CWChannel * channelObj in channels) {
-        if ([channelObj channelNumber] == channel) {
+        if (channelObj.channelNumber == channel) {
             return [interface setWLANChannel:channelObj error:nil];
         }
     }

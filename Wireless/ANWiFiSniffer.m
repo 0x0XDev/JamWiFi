@@ -111,9 +111,9 @@
                         return;
                     }
                 }
-                if (!packet && !wPacket) {
+                if (!packet && !wPacket)
                     usleep(5000); // sleep for 5 milliseconds
-                }
+					
             }
         }
     }

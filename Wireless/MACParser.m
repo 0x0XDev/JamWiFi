@@ -17,7 +17,7 @@ NSString * MACToString(const unsigned char * mac) {
 BOOL copyMAC(const char * macString, unsigned char * mac) {
     NSString * macStr = [NSString stringWithUTF8String:macString];
     NSArray * components = [macStr componentsSeparatedByString:@":"];
-    for (int i = 0; i < [components count]; i++) {
+    for (int i = 0; i < components.count; i++) {
         if (i >= 6) break;
         unsigned result = 0;
         NSScanner * scanner = [NSScanner scannerWithString:[components objectAtIndex:i]];

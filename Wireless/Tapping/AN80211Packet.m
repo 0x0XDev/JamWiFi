@@ -13,11 +13,11 @@
 - (id)initWithData:(NSData *)data {
     if ((self = super.init)) {
         if ([data length] < 24) return nil;
-        packetData = (unsigned char *)malloc([data length]);
-        memcpy(packetData, [data bytes], [data length]);
+        packetData = (unsigned char *)malloc(data.length);
+        memcpy(packetData, data.bytes, data.length);
         macHeader = (MACHeader *)packetData;
         bodyData = packetData + sizeof(MACHeader);
-        packetLength = (int)[data length];
+        packetLength = (int)data.length;
         bodyLength = packetLength - sizeof(MACHeader);
     }
     return self;
