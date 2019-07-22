@@ -40,7 +40,7 @@ var _bind: bindFunc?
 var _scan: scanFunc?
 var _close: closeFunc?
 
-@NSApplicationMain
+//@NSApplicationMain
 class JWAppDelegate: NSObject, NSApplicationDelegate {
 
 	@IBOutlet weak var window: NSWindow!
@@ -53,7 +53,7 @@ class JWAppDelegate: NSObject, NSApplicationDelegate {
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
 		// Insert code here to initialize your application
-		
+		print("JWDelegate: Launch Complete.")
 		
 		if let handle = dlopen(nil, RTLD_LAZY) {
 		//if let handle = dlopen("/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Apple80211", RTLD_LAZY) {
