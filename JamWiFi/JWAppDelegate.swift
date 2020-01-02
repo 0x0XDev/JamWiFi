@@ -48,7 +48,7 @@ class JWAppDelegate: NSObject, NSApplicationDelegate {
 	var activeView: NSView?
 	var nextView: NSView?
 	var animating = false
-	var networkList: ANListView?
+	var networkList: JWListView?
 
 
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -72,7 +72,7 @@ class JWAppDelegate: NSObject, NSApplicationDelegate {
 			dlclose(handle)
 		} else { ErrorInfo(errorCode: 5) }
 		
-		networkList = ANListView(frame: window.contentView?.bounds ?? NSRect.null)
+		networkList = JWListView(frame: window.contentView?.bounds ?? NSRect.null)
 		push(networkList, direction: .forward)
 		CarbonAppProcess.current().makeFrontmost()
 	}

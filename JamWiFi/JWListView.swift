@@ -8,7 +8,7 @@
 import Cocoa
 import CoreWLAN
 
-class ANListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
+class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 	var interfaceName = ""
 	var networks: [CWNetwork] = []
 	var scanButton: NSButton?
@@ -103,7 +103,8 @@ class ANListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 	}
 	
 	required init?(coder decoder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
+		super.init(coder: decoder)
+		//fatalError("init(coder:) has not been implemented")
 	}
 	
 	@objc func scanButton(_ sender: Any?) {
@@ -125,7 +126,7 @@ class ANListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 			theNetworks.append(self.networks[idx])
 		}
 		let sniffer = ANWiFiSniffer(interfaceName: interfaceName)
-		let gatherer = ANTrafficGatherer(frame: bounds, sniffer: sniffer, networks: theNetworks)
+		let gatherer = JWTrafficGatherer(frame: bounds, sniffer: sniffer, networks: theNetworks)
 		(NSApp.delegate as? JWAppDelegate)?.push(gatherer, direction: .forward)
 	}
 	

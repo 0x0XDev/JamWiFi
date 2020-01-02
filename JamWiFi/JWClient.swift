@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ANClient: NSObject {
+class JWClient: NSObject {
 	var packetCount = 0
 	var deauthsSent = 0
 	private(set) var macAddress: [CUnsignedChar] = []
@@ -27,11 +27,11 @@ class ANClient: NSObject {
 	}
 	
 	override func isEqual(_ object: Any?) -> Bool {
-		if !(object is ANClient) {
+		if !(object is JWClient) {
 			return false
 		}
-		let client = object as? ANClient
-		if memcmp(client?.bssid, bssid, 6) == 0 && memcmp(client?.macAddress, macAddress, 6) == 0 {
+		let client = object as? JWClient
+		if memcmp(client!.bssid, bssid, 6) == 0 && memcmp(client!.macAddress, macAddress, 6) == 0 {
 			return true
 		}
 		

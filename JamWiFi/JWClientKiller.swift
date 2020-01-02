@@ -32,8 +32,8 @@ let DEAUTH_REQ: [UInt8] = [
 //"\\xC0\\x00\\x3A\\x01\\xCC\\xCC\\xCC\\xCC\\xCC\\xCC\\xBB\\xBB\\xBB\\xBB\\xBB\\xBB\\xBB\\xBB\\xBB\\xBB\\xBB\\xBB\\x00\\x00\\x07\\x00"
 
 
-class ANClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTableViewDataSource {
-	var clients: [ANClient] = []
+class JWClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTableViewDataSource {
+	var clients: [JWClient] = []
 	var channels: [CWChannel] = []
 	var networksForChannel: [CWChannel : [CWNetwork]] = [:]
 	var channelIndex = 0
@@ -48,7 +48,7 @@ class ANClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 
 	
 
-	init(frame: NSRect, sniffer theSniffer: ANWiFiSniffer?, networks: [CWNetwork]?, clients theClients: [ANClient]?) {
+	init(frame: NSRect, sniffer theSniffer: ANWiFiSniffer?, networks: [CWNetwork]?, clients theClients: [JWClient]?) {
 		super.init(frame: frame)
 		clients = theClients ?? []
 		sniffer = theSniffer
@@ -89,7 +89,8 @@ class ANClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 	}
 	
 	required init?(coder decoder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
+		super.init(coder: decoder)
+		//fatalError("init(coder:) has not been implemented")
 	}
 	
 	func configureUI() {
@@ -168,7 +169,7 @@ class ANClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 			networkArr.forEach { networks.append($0) }
 		}
 		
-		let gatherer = ANTrafficGatherer(frame: bounds, sniffer: sniffer, networks: networks)
+		let gatherer = JWTrafficGatherer(frame: bounds, sniffer: sniffer, networks: networks)
 		(NSApp.delegate as? JWAppDelegate)?.push(gatherer, direction: .backward)
 	}
 	
@@ -301,7 +302,7 @@ class ANClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 			if !includesBSSID(bssid) {
 				return
 			}
-			if memcmp(withUnsafeBytes(of: packet?.macHeader().pointee.mac2){$0.baseAddress}, withUnsafeBytes(of: packet?.macHeader().pointee.mac3){$0.baseAddress}, 6) != 0 {
+			if memcmp(withUnsafeBytes(of: packet?.macHeader().pointee.mac2){$0.baseAddress!}, withUnsafeBytes(of: packet?.macHeader().pointee.mac3){$0.baseAddress!}, 6) != 0 {
 				client = withUnsafeBytes(of: packet?.macHeader().pointee.mac2) {
 					Array($0.bindMemory(to: CUnsignedChar.self))
 				}
@@ -332,7 +333,7 @@ class ANClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 			hasClient = false
 		}
 		if hasClient {
-			let clientObj = ANClient(mac: client, bssid: bssid)
+			let clientObj = JWClient(mac: client, bssid: bssid)
 			var containsClient = false
 			for aClient in clients {
 				if memcmp(aClient.macAddress, clientObj.macAddress, 6) == 0 {

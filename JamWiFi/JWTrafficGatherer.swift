@@ -10,13 +10,13 @@ import CoreWLAN
 import AppKit
 
 
-class ANTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTableViewDataSource {
+class JWTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTableViewDataSource {
 	var sniffer: ANWiFiSniffer?
 	var networks: [CWNetwork] = []
 	var channels: [CWChannel] = []
 	var channelIndex = 0
 	var hopTimer: Timer?
-	var allClients: [ANClient] = []
+	var allClients: [JWClient] = []
 	var clientsTable: NSTableView?
 	var clientsScrollView: NSScrollView?
 	var backButton: NSButton?
@@ -50,7 +50,8 @@ class ANTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NST
 	}
 	
 	required init?(coder decoder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
+		super.init(coder: decoder)
+		//fatalError("init(coder:) has not been implemented")
 	}
 	
 	func configureUI() {
@@ -130,7 +131,7 @@ class ANTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NST
 	}
 	
 	@objc func continueButton(_ sender: Any?) {
-		let killer = ANClientKiller(frame: bounds, sniffer: sniffer, networks: networks, clients: allClients)
+		let killer = JWClientKiller(frame: bounds, sniffer: sniffer, networks: networks, clients: allClients)
 		(NSApp.delegate as? JWAppDelegate)?.push(killer, direction: .forward)
 	}
 	
@@ -225,7 +226,7 @@ class ANTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NST
 				return
 			}
 			
-			if memcmp(withUnsafeBytes(of: packet?.macHeader().pointee.mac2){$0.baseAddress}, withUnsafeBytes(of: packet?.macHeader().pointee.mac3){$0.baseAddress}, 6) != 0 {
+			if memcmp(withUnsafeBytes(of: packet?.macHeader().pointee.mac2){$0.baseAddress!}, withUnsafeBytes(of: packet?.macHeader().pointee.mac3){$0.baseAddress!}, 6) != 0 {
 				client = withUnsafeBytes(of: packet?.macHeader().pointee.mac2) {
 					Array($0.bindMemory(to: CUnsignedChar.self))
 				}
@@ -253,11 +254,11 @@ class ANTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NST
 			hasClient = false
 		}
 		if hasClient {
-			let clientObj = ANClient(mac: client, bssid: bssid)
+			let clientObj = JWClient(mac: client, bssid: bssid)
 			if !allClients.contains(clientObj) {
 				allClients.append(clientObj)
 			} else {
-				guard let index = allClients.index(of: clientObj) else {return}
+				guard let index = allClients.firstIndex(of: clientObj) else {return}
 				let origClient = allClients[index]
 				origClient.packetCount += 1
 				origClient.rssi = Float(packet!.rssi)
