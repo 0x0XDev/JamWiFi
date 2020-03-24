@@ -1,10 +1,5 @@
-//
-//  AppDelegate.swift
-//  JamWiFi
-//
-//  Created by Leonardos Jr. on 20.07.19.
-//  Copyright © 2019 Troger Inc. All rights reserved.
-//
+
+
 
 import Cocoa
 
@@ -54,6 +49,12 @@ class JWAppDelegate: NSObject, NSApplicationDelegate {
 	func applicationDidFinishLaunching(_ aNotification: Notification) {
 		// Insert code here to initialize your application
 		print("JWDelegate: Launch Complete.")
+		
+		// Change Apple Defaults for `scan_merge`
+		if UserDefaults.standard.dictionary(forKey: "USER_SCAN_OPTIONS") == nil {
+			UserDefaults.standard.set(["SCAN_MERGE":kCFBooleanFalse], forKey: "USER_SCAN_OPTIONS")
+		}
+	
 		
 		if let handle = dlopen(nil, RTLD_LAZY) {
 		//if let handle = dlopen("/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Apple80211", RTLD_LAZY) {
@@ -140,6 +141,9 @@ class JWAppDelegate: NSObject, NSApplicationDelegate {
 	func applicationWillTerminate(_ aNotification: Notification) {
 		// Insert code here to tear down your application
 	}
-
+	@IBAction func preferencesPressed(_ sender: Any) {
+		JWPreferences.shared.show()
+	}
+	
 }
 

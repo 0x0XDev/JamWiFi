@@ -1,9 +1,5 @@
-//
-//  JWClientKiller.swift
-//  JamWiFi
-//
-//  Created by Leonardos Jr. on 18.07.19.
-//
+
+
 
 import Foundation
 import AppKit
@@ -45,7 +41,8 @@ class JWClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 	var doneButton: NSButton?
 	var newClientsCheck: NSButton?
 
-
+	var sortAscending = true
+	var sortOrder = ""
 	
 
 	init(frame: NSRect, sniffer theSniffer: ANWiFiSniffer?, networks: [CWNetwork]?, clients theClients: [JWClient]?) {
@@ -122,18 +119,21 @@ class JWClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 		enabledColumn.headerCell.stringValue = "Jam"
 		enabledColumn.width = 30
 		enabledColumn.isEditable = true
+		enabledColumn.sortDescriptorPrototype = NSSortDescriptor(key: enabledColumn.identifier.rawValue, ascending: true)
 		infoTable?.addTableColumn(enabledColumn)
 		
 		let deviceColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("device"))
 		deviceColumn.headerCell.stringValue = "Device"
 		deviceColumn.width = 120
 		deviceColumn.isEditable = false
+		deviceColumn.sortDescriptorPrototype = NSSortDescriptor(key: deviceColumn.identifier.rawValue, ascending: true)
 		infoTable?.addTableColumn(deviceColumn)
 		
 		let deauthsColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("count"))
 		deauthsColumn.headerCell.stringValue = "Deauths"
 		deauthsColumn.width = 120
 		deauthsColumn.isEditable = false
+		deauthsColumn.sortDescriptorPrototype = NSSortDescriptor(key: deauthsColumn.identifier.rawValue, ascending: true)
 		infoTable?.addTableColumn(deauthsColumn)
 		
 		infoScrollView?.documentView = infoTable
@@ -216,6 +216,31 @@ class JWClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 		}
 	}
 	
+	func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+		
+		guard let sortDescriptor = tableView.sortDescriptors.first else {
+		   return
+		 }
+		
+		sortAscending = sortDescriptor.ascending
+		sortOrder = sortDescriptor.key!
+		sortNetworks()
+		infoTable?.reloadData()
+	}
+	
+	func sortNetworks() {
+		if sortOrder == "" { return }
+		
+		let order: ComparisonResult = sortAscending ? .orderedAscending : .orderedDescending
+
+		switch sortOrder {
+			case "enabled": clients.sort { $0.enabled.description.localizedStandardCompare($1.enabled.description) == order}; break
+			case "device": clients.sort { MACToString($0.macAddress).localizedStandardCompare(MACToString($1.macAddress)) == order}; break
+			case "count": clients.sort { String($0.packetCount).localizedStandardCompare(String($1.packetCount)) == order}; break
+			default: break
+		}
+	}
+	
 	// MARK: - Deauthing -
 	
 	@objc func performNextRound() {
@@ -242,6 +267,7 @@ class JWClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 				client.deauthsSent += 1
 			}
 		}
+//		sortNetworks()
 		infoTable?.reloadData()
 	}
 	
@@ -343,6 +369,7 @@ class JWClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 			}
 			if !containsClient {
 				clients.append(clientObj)
+//				sortNetworks()
 				infoTable?.reloadData()
 			}
 		}

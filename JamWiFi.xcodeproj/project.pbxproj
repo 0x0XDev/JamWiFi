@@ -27,6 +27,7 @@
 		D771CD0B23BF684B006BD814 /* CarbonAppProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = D771CCFF23BF684B006BD814 /* CarbonAppProcess.m */; };
 		D771CD0C23BF684B006BD814 /* JWClientKiller.swift in Sources */ = {isa = PBXBuildFile; fileRef = D771CD0123BF684B006BD814 /* JWClientKiller.swift */; };
 		D775909E22E50F020033BBE3 /* Apple80211.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D775909D22E50F020033BBE3 /* Apple80211.framework */; };
+		D7D9D43724293ED8006527FD /* JWPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D9D43624293ED8006527FD /* JWPreferences.swift */; };
 		D7F803D422E12E5D00E3E380 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAB94BCE15C0557A0031197A /* AppKit.framework */; };
 		FAB94BCC15C0557A0031197A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAB94BCB15C0557A0031197A /* Cocoa.framework */; };
 		FAB94C0915C05BB10031197A /* CoreWLAN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAB94C0815C05BB10031197A /* CoreWLAN.framework */; };
@@ -91,6 +92,7 @@
 		D771CD0023BF684B006BD814 /* JamWiFi-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "JamWiFi-Bridging-Header.h"; sourceTree = "<group>"; };
 		D771CD0123BF684B006BD814 /* JWClientKiller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWClientKiller.swift; sourceTree = "<group>"; };
 		D775909D22E50F020033BBE3 /* Apple80211.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Apple80211.framework; path = ../../../../../../System/Library/PrivateFrameworks/Apple80211.framework; sourceTree = "<group>"; };
+		D7D9D43624293ED8006527FD /* JWPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWPreferences.swift; sourceTree = "<group>"; };
 		FAB94BC715C0557A0031197A /* JamWiFi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JamWiFi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAB94BCB15C0557A0031197A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		FAB94BCE15C0557A0031197A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -169,10 +171,11 @@
 				D771CCF623BF684B006BD814 /* JWTrafficGatherer.swift */,
 				D771CCF723BF684B006BD814 /* JWClient.swift */,
 				D771CCFE23BF684B006BD814 /* JWAppDelegate.swift */,
+				D771CD0123BF684B006BD814 /* JWClientKiller.swift */,
 				D771CCF523BF684B006BD814 /* CarbonAppProcess.h */,
 				D771CCFF23BF684B006BD814 /* CarbonAppProcess.m */,
+				D7D9D43624293ED8006527FD /* JWPreferences.swift */,
 				D771CD0D23BF68BE006BD814 /* Supporting Files */,
-				D771CD0123BF684B006BD814 /* JWClientKiller.swift */,
 			);
 			path = JamWiFi;
 			sourceTree = "<group>";
@@ -313,6 +316,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D771CCEE23BF6818006BD814 /* ANBeaconPart.m in Sources */,
+				D7D9D43724293ED8006527FD /* JWPreferences.swift in Sources */,
 				D771CCED23BF6818006BD814 /* HelperFunc.m in Sources */,
 				D771CCEC23BF6818006BD814 /* ANWiFiSniffer.m in Sources */,
 				D771CD0A23BF684B006BD814 /* JWAppDelegate.swift in Sources */,
@@ -406,6 +410,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1.3.1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = /System/Library/PrivateFrameworks;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -416,7 +421,8 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks/Apple80211.framework/Versions/A",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.troger.JamWiFi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -434,6 +440,7 @@
 				CLANG_DEBUG_INFORMATION_LEVEL = "line-tables-only";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1.3.1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = /System/Library/PrivateFrameworks;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -445,7 +452,8 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks/Apple80211.framework/Versions/A",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.troger.JamWiFi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;

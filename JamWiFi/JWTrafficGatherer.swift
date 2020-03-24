@@ -1,9 +1,5 @@
-//
-//  JWTrafficGatherer.swift
-//  JamWiFi
-//
-//  Created by Leonardos Jr. on 18.07.19.
-//
+
+
 
 import Foundation
 import CoreWLAN
@@ -21,6 +17,9 @@ class JWTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NST
 	var clientsScrollView: NSScrollView?
 	var backButton: NSButton?
 	var continueButton: NSButton?
+	
+	var sortAscending = true
+	var sortOrder = ""
 	
 	init(frame frameRect: NSRect, sniffer aSniffer: ANWiFiSniffer?, networks theNetworks: [CWNetwork]?) {
 		super.init(frame: frameRect)
@@ -77,30 +76,35 @@ class JWTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NST
 		checkedColumn.headerCell.stringValue = "Jam"
 		checkedColumn.width = 30
 		checkedColumn.isEditable = true
+		checkedColumn.sortDescriptorPrototype = NSSortDescriptor(key: checkedColumn.identifier.rawValue, ascending: true)
 		clientsTable?.addTableColumn(checkedColumn)
 		
 		let deviceColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("device"))
 		deviceColumn.headerCell.stringValue = "Device"
 		deviceColumn.width = 120
 		deviceColumn.isEditable = false
+		deviceColumn.sortDescriptorPrototype = NSSortDescriptor(key: deviceColumn.identifier.rawValue, ascending: true)
 		clientsTable?.addTableColumn(deviceColumn)
 		
 		let bssidColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("bssid"))
 		bssidColumn.headerCell.stringValue = "BSSID (Access Point)"
 		bssidColumn.width = 120
 		bssidColumn.isEditable = false
+		bssidColumn.sortDescriptorPrototype = NSSortDescriptor(key: bssidColumn.identifier.rawValue, ascending: true)
 		clientsTable?.addTableColumn(bssidColumn)
 		
 		let packetsColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("count"))
 		packetsColumn.headerCell.stringValue = "Packets"
 		packetsColumn.width = 120
 		packetsColumn.isEditable = false
+		packetsColumn.sortDescriptorPrototype = NSSortDescriptor(key: packetsColumn.identifier.rawValue, ascending: true)
 		clientsTable?.addTableColumn(packetsColumn)
 		
 		let rssiColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("rssi"))
 		rssiColumn.headerCell.stringValue = "RSSI"
 		rssiColumn.width = 70
 		rssiColumn.isEditable = false
+		rssiColumn.sortDescriptorPrototype = NSSortDescriptor(key: rssiColumn.identifier.rawValue, ascending: true)
 		clientsTable?.addTableColumn(rssiColumn)
 		
 		clientsScrollView?.documentView = clientsTable
@@ -191,6 +195,34 @@ class JWTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NST
 		sniffer?.setChannel(channels[channelIndex])
 	}
 	
+	func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+		
+		guard let sortDescriptor = tableView.sortDescriptors.first else {
+		   return
+		 }
+		
+		sortAscending = sortDescriptor.ascending
+		sortOrder = sortDescriptor.key!
+		sortNetworks()
+		clientsTable?.reloadData()
+	}
+	
+	func sortNetworks() {
+		if sortOrder == "" { return }
+		
+		let order: ComparisonResult = sortAscending ? .orderedAscending : .orderedDescending
+
+		switch sortOrder {
+			case "enabled": allClients.sort { $0.enabled.description.localizedStandardCompare($1.enabled.description) == order}; break
+			case "device": allClients.sort { MACToString($0.macAddress).localizedStandardCompare(MACToString($1.macAddress)) == order}; break
+			case "bssid": allClients.sort { MACToString($0.bssid).localizedStandardCompare(MACToString($1.bssid)) == order}; break
+			case "count": allClients.sort { String($0.packetCount).localizedStandardCompare(String($1.packetCount)) == order}; break
+			case "rssi": allClients.sort { String($0.rssi).localizedStandardCompare(String($1.rssi)) == order}; break
+			default: break
+		}
+		
+	}
+	
 	// MARK: WiFi Sniffer
 	func wifiSnifferFailed(toOpenInterface sniffer: ANWiFiSniffer?) {
 		runAlert("Interface Error", "Failed to open sniffer interface.")
@@ -263,6 +295,7 @@ class JWTrafficGatherer: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NST
 				origClient.packetCount += 1
 				origClient.rssi = Float(packet!.rssi)
 			}
+			sortNetworks()
 			clientsTable?.reloadData()
 		}
 	}

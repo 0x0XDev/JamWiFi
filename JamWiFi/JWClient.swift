@@ -1,9 +1,5 @@
-//
-//  JWClient.swift
-//  JamWiFi
-//
-//  Created by Leonardos Jr. on 18.07.19.
-//
+
+
 
 import Foundation
 
