@@ -36,7 +36,7 @@ class JWPreferences: NSViewController {
 		
 		view = NSView(frame: NSMakeRect(0, 0, 500, 200))
 		
-		let scanningLabel = NSTextField(labelWithString: "Scanning Options")
+		let scanningLabel = NSTextField(labelWithAttributedString: NSAttributedString(string: "Scanning Options", attributes: [.font:NSFont.boldSystemFont(ofSize: 13)]))
 		scanningLabel.frame.origin = CGPoint(x: 15, y: view.frame.height-scanningLabel.frame.height-20)
 		
 		let mergeOption = NSButton(checkboxWithTitle: "Merge Networks with same SSIDs and different BSSIDs", target: self, action: #selector(mergeClicked))
@@ -57,17 +57,17 @@ class JWPreferences: NSViewController {
 		let bssTypeLabel = NSTextField(labelWithString: "BSS Type")
 		bssTypeLabel.frame.origin = CGPoint(x: includeClosed.frame.origin.x, y: includeClosed.frame.origin.y-bssTypeLabel.frame.height-10)
 		
-		let bssType = NSPopUpButton(frame: NSMakeRect(bssTypeLabel.frame.origin.x+bssTypeLabel.frame.width+10, bssTypeLabel.frame.origin.y-4, 130, 20), pullsDown: false)
+		let bssType = NSPopUpButton(frame: NSMakeRect(bssTypeLabel.frame.origin.x+bssTypeLabel.frame.width+12, bssTypeLabel.frame.origin.y-4, 130, 20), pullsDown: false)
 		bssType.addItems(withTitles: bssTypes)
 		bssType.refusesFirstResponder = true
 		bssType.target = self
 		bssType.action = #selector(bssTypeSelected)
 		bssType.selectItem(at: tempPrefs["SCAN_BSS_TYPE"] == nil ? 2 : tempPrefs["SCAN_BSS_TYPE"] as! Int - 1)
 		
-		let scanTypeLabel = NSTextField(labelWithString: "BSS Type")
+		let scanTypeLabel = NSTextField(labelWithString: "Scan Type")
 		scanTypeLabel.frame.origin = CGPoint(x: bssTypeLabel.frame.origin.x, y: bssTypeLabel.frame.origin.y-scanTypeLabel.frame.height-10)
 		
-		let scanType = NSPopUpButton(frame: NSMakeRect(scanTypeLabel.frame.origin.x+scanTypeLabel.frame.width+10, scanTypeLabel.frame.origin.y-4, 130, 20), pullsDown: false)
+		let scanType = NSPopUpButton(frame: NSMakeRect(bssType.frame.origin.x, scanTypeLabel.frame.origin.y-4, 130, 20), pullsDown: false)
 		scanType.addItems(withTitles: scanTypes)
 		scanType.refusesFirstResponder = true
 		scanType.target = self
