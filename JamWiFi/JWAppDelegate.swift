@@ -73,6 +73,7 @@ class JWAppDelegate: NSObject, NSApplicationDelegate {
 			dlclose(handle)
 		} else { ErrorInfo(errorCode: 5) }
 		
+		window.isMovableByWindowBackground = true
 		networkList = JWListView(frame: window.contentView?.bounds ?? NSRect.null)
 		push(networkList, direction: .forward)
 		CarbonAppProcess.current().makeFrontmost()

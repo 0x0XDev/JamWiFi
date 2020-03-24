@@ -228,7 +228,7 @@ class JWClientKiller: NSView, ANWiFiSnifferDelegate, NSTableViewDelegate, NSTabl
 		infoTable?.reloadData()
 	}
 	
-	func sortNetworks() {
+	@inline(__always) func sortNetworks() {
 		if sortOrder == "" { return }
 		
 		let order: ComparisonResult = sortAscending ? .orderedAscending : .orderedDescending
