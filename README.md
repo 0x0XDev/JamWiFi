@@ -14,6 +14,12 @@
 
 [Download Latest Pre-Compiled](https://github.com/anonymouz4/JamWiFi/releases/latest)
 
+---
+
+#### Known Bugs
+Devices that are build 2018 and later seem to crash when performing the packet injection. Unfortunately, I don't possess such a device myself, so I'm not able to fix it right now
+
+---
 ## Legacy ReadMe
 
 #### What Does It Do?
