@@ -8,6 +8,7 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 	var interfaceName = ""
 	var networks: [CWNetwork] = []
 	var scanButton: NSButton?
+	var joinButton: NSButton?
 	var disassociateButton: NSButton?
 	var jamButton: NSButton?
 	var progressIndicator: NSProgressIndicator?
@@ -24,8 +25,9 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		networksScrollView = NSScrollView(frame: NSRect(x: 10, y: 52, width: frame.size.width - 20, height: frame.size.height - 62))
 		networksTable = NSTableView(frame: networksScrollView?.contentView.bounds ?? NSRect.zero)
 		disassociateButton = NSButton(frame: NSRect(x: 10, y: 10, width: 100, height: 24))
-		scanButton = NSButton(frame: NSRect(x: 110, y: 10, width: 100, height: 24))
-		progressIndicator = NSProgressIndicator(frame: NSRect(x: 225, y: 14, width: 16, height: 16))
+		joinButton = NSButton(frame: NSRect(x: 110, y: 10, width: 100, height: 24))
+		scanButton = NSButton(frame: NSRect(x: 210, y: 10, width: 100, height: 24))
+		progressIndicator = NSProgressIndicator(frame: NSRect(x: 325, y: 14, width: 16, height: 16))
 		jamButton = NSButton(frame: NSRect(x: frame.size.width - 110, y: 10, width: 100, height: 24))
 		
 		progressIndicator?.controlSize = .small
@@ -37,6 +39,19 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		scanButton?.target = self
 		scanButton?.action = #selector(scanButton(_:))
 		scanButton?.font = NSFont.systemFont(ofSize: 13)
+		
+		scanButton?.bezelStyle = .rounded
+		scanButton?.title = "Scan"
+		scanButton?.target = self
+		scanButton?.action = #selector(scanButton(_:))
+		scanButton?.font = NSFont.systemFont(ofSize: 13)
+		
+		joinButton?.bezelStyle = .rounded
+		joinButton?.title = "Join"
+		joinButton?.target = self
+		joinButton?.action = #selector(joinButton(_:))
+		joinButton?.font = NSFont.systemFont(ofSize: 13)
+		joinButton?.isEnabled = false
 		
 		disassociateButton?.bezelStyle = .rounded
 		disassociateButton?.title = "Deauth"
@@ -102,6 +117,7 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		
 		if let _ = networksScrollView { addSubview(networksScrollView!) }
 		if let _ = scanButton { addSubview(scanButton!) }
+		if let _ = joinButton { addSubview(joinButton!) }
 		if let _ = disassociateButton { addSubview(disassociateButton!) }
 		if let _ = progressIndicator { addSubview(progressIndicator!) }
 		if let _ = jamButton { addSubview(jamButton!) }
@@ -123,6 +139,83 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		progressIndicator?.startAnimation(self)
 		scanButton?.isEnabled = false
 		scanInBackground()
+	}
+	
+	@objc func sheetOkPressed(_ sender: Any?) {
+		self.window?.endSheet((sender as! NSView).window!, returnCode: .OK)
+	}
+	@objc func sheetCancelPressed(_ sender: Any?) {
+		self.window?.endSheet((sender as! NSView).window!, returnCode: .cancel)
+	}
+	
+	@objc func joinButton(_ sender: Any?) {
+		
+		progressIndicator?.startAnimation(self)
+		joinButton?.isEnabled = false
+		let network: CWNetwork = self.networks[(networksTable?.selectedRowIndexes.first)!]
+		var password = ""
+		let done: ((Bool)->()) = {run in
+			if run {
+				self.interfaceName = CWWiFiClient.shared().interface()?.interfaceName ?? "en0"
+				var airportHandle: UnsafeMutableRawPointer?
+				
+				_ = _open!(&airportHandle)
+				_ = _bind!(airportHandle, self.interfaceName)
+				let result = _associate!(airportHandle, network.value(forKey: "_scanRecord") as! NSDictionary, password as NSString)
+				
+				if result == 0 {
+					print("success")
+				} else {
+					print("fail: \(String(cString: _errStr!(result)))")
+				}
+				
+				_ = _close!(airportHandle)
+			}
+			DispatchQueue.main.async {
+				self.progressIndicator?.stopAnimation(self)
+				self.joinButton?.isEnabled = true
+			}
+		}
+		
+		if network.supportsSecurity(.none) == false {
+			
+			let sheetWindow = NSWindow(contentRect: NSMakeRect(0, 0, 300, 100), styleMask: [.docModalWindow,.titled], backing: .buffered, defer: false)
+
+			let label = NSTextField(labelWithString: "Enter Password:")
+			label.frame = NSMakeRect(13, sheetWindow.frame.height-label.frame.height-12, label.frame.width, label.frame.height)
+			
+			let passwordField = NSTextField(frame: NSRect(x: label.frame.origin.x+2, y: 38, width: 270, height: 24))
+			passwordField.placeholderString = "Password"
+			passwordField.target = self
+			passwordField.action = #selector(sheetOkPressed(_:))
+	
+			let cancelButton = NSButton(frame: NSRect(x: sheetWindow.frame.width-70-6, y: 5, width: 70, height: 24))
+			let okButton = NSButton(frame: NSRect(x: cancelButton.frame.origin.x-70, y: 5, width: 70, height: 24))
+			
+			cancelButton.bezelStyle = .rounded
+			cancelButton.title = "Cancel"
+			cancelButton.target = self
+			cancelButton.action = #selector(sheetCancelPressed(_:))
+
+			okButton.bezelStyle = .rounded
+			okButton.title = "Try"
+			okButton.target = self
+			okButton.action = #selector(sheetOkPressed(_:))
+			okButton.isHighlighted = true
+
+			sheetWindow.contentView?.addSubview(label)
+			sheetWindow.contentView?.addSubview(passwordField)
+			
+			sheetWindow.contentView?.addSubview(okButton)
+			sheetWindow.contentView?.addSubview(cancelButton)
+			
+			self.window?.beginSheet(sheetWindow, completionHandler: { (response) in
+				password = passwordField.stringValue
+				DispatchQueue.global(qos: .userInitiated).async { done(response == .OK) }
+			})
+		} else {
+			DispatchQueue.global(qos: .userInitiated).async { done(true) }
+		}
 	}
 	
 	@objc func disassociateButton(_ sender: Any?) {
@@ -151,14 +244,13 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 			
 			let scanParams: NSDictionary = UserDefaults.standard.dictionary(forKey: "USER_SCAN_OPTIONS") as NSDictionary? ?? NSDictionary()
 				
-
 			_ = _open!(&airportHandle)
 			_ = _bind!(airportHandle, self.interfaceName)
-			_ = _scan!(airportHandle, &foundNets, scanParams)
+			let result = _scan!(airportHandle, &foundNets, scanParams)
 			
 
 			if foundNets == nil {
-				print("wifi scan error")
+				print("wifi scan error: \(String(cString: _errStr!(result)))")
 				
 				// Cleanup
 				_ = _close!(airportHandle)
@@ -176,7 +268,6 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 				
 				// Cleanup
 				_ = _close!(airportHandle)
-				
 				
 				weakSelf?.performSelector(onMainThread: #selector(self.handleScanSuccess(_:)), with: networks, waitUntilDone: false)
 			}
@@ -208,11 +299,8 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		return
 	}
 	func tableViewSelectionDidChange(_ notification: Notification) {
-		if networksTable?.selectedRowIndexes.count ?? 0 > 0 {
-			jamButton?.isEnabled = true
-		} else {
-			jamButton?.isEnabled = false
-		}
+		jamButton?.isEnabled = networksTable?.selectedRowIndexes.count ?? 0 > 0 ? true : false
+		joinButton?.isEnabled = networksTable?.selectedRowIndexes.count ?? 0 == 1 ? true : false
 	}
 	
 	func securityTypeString(_ network: CWNetwork?) -> String {

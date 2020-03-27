@@ -12,7 +12,10 @@ enum ANViewSlideDirection : Int {
 typealias openFunc = @convention(c) (UnsafeMutableRawPointer?) -> CInt
 typealias bindFunc = @convention(c) (UnsafeMutableRawPointer?, String) -> CInt
 typealias scanFunc = @convention(c) (UnsafeMutableRawPointer?, UnsafeMutableRawPointer?, NSDictionary) -> CInt
+typealias associateFunc = @convention(c) (UnsafeMutableRawPointer?, NSDictionary, NSString) -> CInt
 typealias closeFunc = @convention(c) (UnsafeMutableRawPointer?) -> CInt
+typealias errStrFunc = @convention(c) (CInt) -> UnsafePointer<CChar>
+
 
 
 //let Apple80211Open: ((UnsafeMutableRawPointer?) -> Int)? = nil
@@ -33,7 +36,9 @@ internal func ErrorInfo(errorCode: Int) {
 var _open: openFunc?
 var _bind: bindFunc?
 var _scan: scanFunc?
+var _associate: associateFunc?
 var _close: closeFunc?
+var _errStr: errStrFunc?
 
 //@NSApplicationMain
 class JWAppDelegate: NSObject, NSApplicationDelegate {
@@ -67,9 +72,15 @@ class JWAppDelegate: NSObject, NSApplicationDelegate {
 			if let scan = dlsym(handle, "Apple80211Scan") {
 				_scan = unsafeBitCast(scan, to: scanFunc.self)
 			} else { ErrorInfo(errorCode: 8) }
+			if let associate = dlsym(handle, "Apple80211Associate") {
+				_associate = unsafeBitCast(associate, to: associateFunc.self)
+			} else { ErrorInfo(errorCode: 9) }
 			if let close = dlsym(handle, "Apple80211Close") {
 				_close = unsafeBitCast(close, to: closeFunc.self)
-			} else { ErrorInfo(errorCode: 9) }
+			} else { ErrorInfo(errorCode: 10) }
+			if let errStr = dlsym(handle, "Apple80211ErrToStr") {
+				_errStr = unsafeBitCast(errStr, to: errStrFunc.self)
+			} else { ErrorInfo(errorCode: 11) }
 			dlclose(handle)
 		} else { ErrorInfo(errorCode: 5) }
 		
