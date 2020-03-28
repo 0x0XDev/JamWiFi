@@ -66,6 +66,7 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		jamButton?.font = NSFont.systemFont(ofSize: 13)
 		jamButton?.isEnabled = false
 		
+		
 		let channelColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("channel"))
 		channelColumn.headerCell.stringValue = "CH"
 		channelColumn.width = 40
@@ -96,10 +97,17 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		
 		let rssiColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("rssi"))
 		rssiColumn.headerCell.stringValue = "RSSI"
-		rssiColumn.width = 60
+		rssiColumn.width = 40
 		rssiColumn.isEditable = true
 		rssiColumn.sortDescriptorPrototype = NSSortDescriptor(key: rssiColumn.identifier.rawValue, ascending: true)
 		networksTable?.addTableColumn(rssiColumn)
+		
+		let channelBandColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("channelBand"))
+		channelBandColumn.headerCell.stringValue = "CH-Band"
+		channelBandColumn.width = 60
+		channelBandColumn.isEditable = true
+		channelBandColumn.sortDescriptorPrototype = NSSortDescriptor(key: channelBandColumn.identifier.rawValue, ascending: true)
+		networksTable?.addTableColumn(channelBandColumn)
 		
 		networksScrollView?.documentView = networksTable
 		networksScrollView?.borderType = .bezelBorder
@@ -107,9 +115,7 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		networksScrollView?.hasHorizontalScroller = true
 		networksScrollView?.autohidesScrollers = false
 		networksScrollView?.hasHorizontalScroller = false
-//		networksScrollView?.hasVerticalScroller = false
-//		print("Scroller: \(networksScrollView?.verticalScroller?.frame.width)")
-		
+
 		networksTable?.dataSource = self
 		networksTable?.delegate = self
 		networksTable?.allowsMultipleSelection = true
@@ -281,7 +287,10 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 	func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
 		let network = networks[row]
 		
-		if tableColumn?.identifier.rawValue == "channel" {
+		if tableColumn?.identifier.rawValue == "channelBand" {
+			let chBand =  network.wlanChannel?.channelBand
+			return chBand! == .bandUnknown ? "?" : (chBand! == .band2GHz ? "2.4 GHz":"5.0 Ghz")
+		} else if tableColumn?.identifier.rawValue == "channel" {
 			return NSNumber(value: network.wlanChannel?.channelNumber ?? 0)
 		} else if tableColumn?.identifier.rawValue == "essid" {
 			return network.ssid ?? "<Hidden>"
@@ -355,6 +364,7 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		let order: ComparisonResult = sortAscending ? .orderedAscending : .orderedDescending
 		
 		switch sortOrder {
+			case "channelBand": networks.sort { String($0.wlanChannel!.channelBand.rawValue).localizedStandardCompare(String($1.wlanChannel!.channelBand.rawValue)) == order}; break
 			case "channel": networks.sort { String($0.wlanChannel!.channelNumber).localizedStandardCompare(String($1.wlanChannel!.channelNumber)) == order}; break
 			case "essid": networks.sort { ($0.ssid ?? "<Hidden>").localizedStandardCompare($1.ssid ?? "<Hidden>") == order}; break
 			case "bssid": networks.sort { $0.bssid?.localizedStandardCompare($1.bssid!) == order}; break
@@ -374,12 +384,12 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 	
 	@objc private func handleScanSuccess(_ theNetworks: [CWNetwork]?) {
 		var newNetworks = theNetworks
-		for network in networks {
-			if !newNetworks!.contains(network) {
-				newNetworks?.append(network)
+		outerLoop: for network in networks {
+			for newNetwork in newNetworks ?? [] {
+				if isNetworkEqual(network, newNetwork) { continue outerLoop }
 			}
+			newNetworks?.append(network)
 		}
-		
 		
 		progressIndicator?.stopAnimation(self)
 		scanButton?.isEnabled = true
@@ -387,6 +397,15 @@ class JWListView: NSView, NSTableViewDelegate, NSTableViewDataSource {
 		
 		sortNetworks()
 		networksTable?.reloadData()
+	}
+	
+	fileprivate func isNetworkEqual(_ network1: CWNetwork, _ network2: CWNetwork) -> Bool {
+		if network1.ssid == network2.ssid &&
+			network1.bssid == network2.bssid &&
+			network1.wlanChannel?.isEqual(to: network2.wlanChannel) ?? false {
+			return true
+		}
+		return false
 	}
 
 }
