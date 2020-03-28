@@ -1,5 +1,9 @@
 > **This Repo is the continuation of [unixpickle/JamWiFi](https://github.com/unixpickle/JamWiFi), since it got deprecated and won't be updated**
 
+#### Update 1.3.2
+- Added Join Option (Intended for Join by BSSID)
+- Scan Errors now have a description (console only)
+
 #### Update 1.3.1
 - Added Settings (Hidden Networks, ..)
 - Added Column Sorting
