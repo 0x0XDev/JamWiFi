@@ -1,3 +1,4 @@
+JamWifi- An Amazig Script
 > **This Repo is the continuation of [unixpickle/JamWiFi](https://github.com/unixpickle/JamWiFi), since it got deprecated and won't be updated**
 
 #### Update 1.3.2
